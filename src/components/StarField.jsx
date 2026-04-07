@@ -1,32 +1,27 @@
-import { useRef, useMemo } from 'react'
+import { useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
+
+const STAR_COUNT = 3000
+const starPositions = new Float32Array(STAR_COUNT * 3)
+const starColors = new Float32Array(STAR_COUNT * 3)
+for (let i = 0; i < STAR_COUNT; i++) {
+  const i3 = i * 3
+  const theta = Math.random() * Math.PI * 2
+  const phi = Math.acos(2 * Math.random() - 1)
+  const r = 50 + Math.random() * 150
+  starPositions[i3] = r * Math.sin(phi) * Math.cos(theta)
+  starPositions[i3 + 1] = r * Math.sin(phi) * Math.sin(theta)
+  starPositions[i3 + 2] = r * Math.cos(phi)
+  const blueShift = Math.random()
+  starColors[i3] = 0.6 + Math.random() * 0.4 - blueShift * 0.2
+  starColors[i3 + 1] = 0.7 + Math.random() * 0.3 - blueShift * 0.1
+  starColors[i3 + 2] = 0.8 + Math.random() * 0.2
+}
 
 function Stars() {
   const pointsRef = useRef()
-  const count = 3000
-
-  const { positions, colors } = useMemo(() => {
-    const positions = new Float32Array(count * 3)
-    const colors = new Float32Array(count * 3)
-
-    for (let i = 0; i < count; i++) {
-      const i3 = i * 3
-      const theta = Math.random() * Math.PI * 2
-      const phi = Math.acos(2 * Math.random() - 1)
-      const r = 50 + Math.random() * 150
-
-      positions[i3] = r * Math.sin(phi) * Math.cos(theta)
-      positions[i3 + 1] = r * Math.sin(phi) * Math.sin(theta)
-      positions[i3 + 2] = r * Math.cos(phi)
-
-      const blueShift = Math.random()
-      colors[i3] = 0.6 + Math.random() * 0.4 - blueShift * 0.2
-      colors[i3 + 1] = 0.7 + Math.random() * 0.3 - blueShift * 0.1
-      colors[i3 + 2] = 0.8 + Math.random() * 0.2
-    }
-
-    return { positions, colors }
-  }, [])
+  const positions = starPositions
+  const colors = starColors
 
   useFrame(() => {
     if (pointsRef.current) {

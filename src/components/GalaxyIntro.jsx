@@ -1,37 +1,32 @@
-import { useRef, useEffect, useMemo } from 'react'
+import { useRef, useEffect } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import gsap from 'gsap'
 
+const GALAXY_COUNT = 8000
+const galaxyPositions = new Float32Array(GALAXY_COUNT * 3)
+const galaxyColors = new Float32Array(GALAXY_COUNT * 3)
+for (let i = 0; i < GALAXY_COUNT; i++) {
+  const i3 = i * 3
+  const arm = i % 2
+  const armOffset = arm * Math.PI
+  const t = Math.random()
+  const radius = Math.pow(t, 0.5) * 25
+  const spiralAngle = radius * 0.4 + armOffset
+  const scatter = (1 - t) * 0.8 + 0.1
+  galaxyPositions[i3] = Math.cos(spiralAngle) * radius + (Math.random() - 0.5) * scatter * 3
+  galaxyPositions[i3 + 1] = (Math.random() - 0.5) * (scatter * 1.5 + 0.3)
+  galaxyPositions[i3 + 2] = Math.sin(spiralAngle) * radius + (Math.random() - 0.5) * scatter * 3
+  const coreT = 1 - t
+  galaxyColors[i3] = THREE.MathUtils.lerp(1.0, 0.3, coreT * 0.5)
+  galaxyColors[i3 + 1] = THREE.MathUtils.lerp(0.7, 0.5, coreT * 0.3)
+  galaxyColors[i3 + 2] = THREE.MathUtils.lerp(0.2, 1.0, coreT)
+}
+
 function GalaxyParticles() {
   const pointsRef = useRef()
-  const count = 8000
-
-  const { positions, colors } = useMemo(() => {
-    const positions = new Float32Array(count * 3)
-    const colors = new Float32Array(count * 3)
-
-    for (let i = 0; i < count; i++) {
-      const i3 = i * 3
-      const arm = i % 2
-      const armOffset = arm * Math.PI
-      const t = Math.random()
-      const radius = Math.pow(t, 0.5) * 25
-      const spiralAngle = radius * 0.4 + armOffset
-      const scatter = (1 - t) * 0.8 + 0.1
-
-      positions[i3] = Math.cos(spiralAngle) * radius + (Math.random() - 0.5) * scatter * 3
-      positions[i3 + 1] = (Math.random() - 0.5) * (scatter * 1.5 + 0.3)
-      positions[i3 + 2] = Math.sin(spiralAngle) * radius + (Math.random() - 0.5) * scatter * 3
-
-      const coreT = 1 - t
-      colors[i3] = THREE.MathUtils.lerp(1.0, 0.3, coreT * 0.5)
-      colors[i3 + 1] = THREE.MathUtils.lerp(0.7, 0.5, coreT * 0.3)
-      colors[i3 + 2] = THREE.MathUtils.lerp(0.2, 1.0, coreT)
-    }
-
-    return { positions, colors }
-  }, [])
+  const positions = galaxyPositions
+  const colors = galaxyColors
 
   useFrame(() => {
     if (pointsRef.current) {
