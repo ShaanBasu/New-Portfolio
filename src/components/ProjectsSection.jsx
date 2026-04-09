@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber'
-import { Html, OrbitControls } from '@react-three/drei'
+import { useRef, useState, useEffect } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { Html } from '@react-three/drei'
 import * as THREE from 'three'
 
 const PROJECTS = [
@@ -165,6 +165,33 @@ function OrbitingPlanet({ project, onSelect, selected }) {
   )
 }
 
+// Auto-rotating camera rig — no OrbitControls so scroll events are never captured
+function CameraRig() {
+  const { camera } = useThree()
+  const angleRef = useRef(0)
+  const mouseRef = useRef({ x: 0, y: 0 })
+
+  useEffect(() => {
+    const onMove = (e) => {
+      mouseRef.current.x = (e.clientX / window.innerWidth - 0.5) * 2
+      mouseRef.current.y = (e.clientY / window.innerHeight - 0.5) * 2
+    }
+    window.addEventListener('mousemove', onMove, { passive: true })
+    return () => window.removeEventListener('mousemove', onMove)
+  }, [])
+
+  useFrame((_, delta) => {
+    angleRef.current += delta * 0.18
+    const x = Math.sin(angleRef.current) * 17 + mouseRef.current.x * 1.5
+    const y = 9 - mouseRef.current.y * 1.5
+    const z = Math.cos(angleRef.current) * 17
+    camera.position.set(x, y, z)
+    camera.lookAt(0, 0, 0)
+  })
+
+  return null
+}
+
 function SolarSystemScene({ onSelect, selectedProject }) {
   return (
     <>
@@ -181,22 +208,13 @@ function SolarSystemScene({ onSelect, selectedProject }) {
           selected={selectedProject?.name === p.name}
         />
       ))}
-      {/* Zoom disabled to prevent scroll trap */}
-      <OrbitControls
-        enablePan={false}
-        enableZoom={false}
-        autoRotate
-        autoRotateSpeed={0.4}
-        maxPolarAngle={Math.PI * 0.58}
-        minPolarAngle={Math.PI * 0.25}
-      />
+      <CameraRig />
     </>
   )
 }
 
 export default function ProjectsSection() {
   const [selectedProject, setSelectedProject] = useState(null)
-  const [isHovered, setIsHovered] = useState(false)
 
   return (
     <section id="projects" className="projects-section">
@@ -207,15 +225,9 @@ export default function ProjectsSection() {
         </p>
       </div>
 
-      {/* pointer-events only active when hovered so scroll passes through */}
-      <div
-        className="projects-canvas"
-        style={{ pointerEvents: isHovered ? 'auto' : 'none' }}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
+      <div className="projects-canvas">
         <Canvas
-          style={{ width: '100%', height: '100%', pointerEvents: 'auto' }}
+          style={{ width: '100%', height: '100%' }}
           camera={{ position: [0, 9, 17], fov: 52 }}
           gl={{ antialias: true }}
         >
@@ -248,7 +260,7 @@ export default function ProjectsSection() {
       )}
 
       <div className="projects-scroll-hint">
-        <span>↓ Scroll past to continue</span>
+        <span>↓ Scroll to continue</span>
       </div>
     </section>
   )

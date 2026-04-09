@@ -7,6 +7,7 @@ import AboutSection from './components/AboutSection.jsx'
 import SkillsSection from './components/SkillsSection.jsx'
 import ProjectsSection from './components/ProjectsSection.jsx'
 import EducationSection from './components/EducationSection.jsx'
+import SectionConnector from './components/SectionConnector.jsx'
 
 export default function App() {
   const [introComplete, setIntroComplete] = useState(false)
@@ -22,9 +23,13 @@ export default function App() {
           <Navigation />
           <main>
             <HomeSection />
+            <SectionConnector type="aurora" />
             <AboutSection />
+            <SectionConnector type="constellation" />
             <SkillsSection />
+            <SectionConnector type="energy" />
             <ProjectsSection />
+            <SectionConnector type="crystal" />
             <EducationSection />
           </main>
         </>

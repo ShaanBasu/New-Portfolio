@@ -28,6 +28,7 @@ function PlanetScene() {
       <pointLight position={[-5, 0, 5]} intensity={1} color="#00d4ff" />
       <Planet
         color="#164e63"
+        planetType="ice"
         size={2.2}
         emissiveColor="#0c4a6e"
         atmosphereColor="#38bdf8"

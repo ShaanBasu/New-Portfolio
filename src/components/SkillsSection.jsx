@@ -51,6 +51,7 @@ function SkillScene() {
       <directionalLight position={[5, 5, 5]} intensity={0.5} />
       <Planet
         color="#b45309"
+        planetType="volcanic"
         size={1.8}
         emissiveColor="#78350f"
         atmosphereColor="#ffd700"

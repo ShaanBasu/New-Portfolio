@@ -527,7 +527,7 @@ body {
   min-width: 300px;
 }
 
-/* Vine Growth */
+/* Vine Growth (legacy - kept for reference) */
 .vine-container {
   position: absolute;
   top: 0;
@@ -542,6 +542,40 @@ body {
 .vine-svg {
   position: absolute;
   bottom: 0;
+}
+
+/* Section Connectors */
+.section-connector {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  pointer-events: none;
+  background: transparent;
+}
+
+.section-connector svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Projects scroll hint */
+.projects-scroll-hint {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0.65;
+  animation: scroll-bounce 2s ease-in-out infinite;
 }
 
 /* Galaxy Intro */
