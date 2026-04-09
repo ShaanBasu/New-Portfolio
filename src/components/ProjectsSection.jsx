@@ -9,9 +9,9 @@ const PROJECTS = [
     desc: 'A real-time AI-powered chat application with ML backend.',
     link: '#',
     color: '#00d4ff',
-    orbitRadius: 4,
+    orbitRadius: 3.5,
     speed: 0.5,
-    size: 0.45,
+    size: 0.42,
     startAngle: 0,
   },
   {
@@ -19,9 +19,9 @@ const PROJECTS = [
     desc: 'Full-stack e-commerce with React and Node.js.',
     link: '#',
     color: '#8b5cf6',
-    orbitRadius: 6,
+    orbitRadius: 5.2,
     speed: 0.35,
-    size: 0.5,
+    size: 0.46,
     startAngle: Math.PI * 0.4,
   },
   {
@@ -29,9 +29,9 @@ const PROJECTS = [
     desc: 'Interactive data visualization dashboard.',
     link: '#',
     color: '#ffd700',
-    orbitRadius: 8,
+    orbitRadius: 7.0,
     speed: 0.25,
-    size: 0.42,
+    size: 0.40,
     startAngle: Math.PI * 0.8,
   },
   {
@@ -39,9 +39,9 @@ const PROJECTS = [
     desc: 'This very 3D space portfolio website.',
     link: '#',
     color: '#ff6b6b',
-    orbitRadius: 10,
+    orbitRadius: 8.8,
     speed: 0.18,
-    size: 0.48,
+    size: 0.44,
     startAngle: Math.PI * 1.2,
   },
   {
@@ -49,34 +49,43 @@ const PROJECTS = [
     desc: 'Machine learning image classifier.',
     link: '#',
     color: '#50fa7b',
-    orbitRadius: 12,
+    orbitRadius: 10.6,
     speed: 0.12,
-    size: 0.44,
+    size: 0.42,
     startAngle: Math.PI * 1.6,
   },
 ]
 
 function Sun() {
   const meshRef = useRef()
+  const glowRef = useRef()
 
   useFrame((state) => {
     if (meshRef.current) {
       meshRef.current.rotation.y += 0.005
-      const pulse = 0.9 + Math.sin(state.clock.elapsedTime * 2) * 0.1
+      const pulse = 0.92 + Math.sin(state.clock.elapsedTime * 2) * 0.08
       meshRef.current.scale.setScalar(pulse)
+    }
+    if (glowRef.current) {
+      const g = 0.95 + Math.sin(state.clock.elapsedTime * 1.5) * 0.05
+      glowRef.current.scale.setScalar(g)
     }
   })
 
   return (
     <group>
-      <pointLight intensity={3} color="#ff9900" distance={50} decay={1.5} />
+      <pointLight intensity={4} color="#ff9900" distance={60} decay={1.2} />
       <mesh ref={meshRef}>
-        <sphereGeometry args={[1.2, 32, 32]} />
-        <meshStandardMaterial color="#ff6600" emissive="#ff9900" emissiveIntensity={1} />
+        <sphereGeometry args={[1.1, 48, 48]} />
+        <meshStandardMaterial color="#ff6600" emissive="#ff9900" emissiveIntensity={1.2} roughness={0.4} metalness={0} />
+      </mesh>
+      <mesh ref={glowRef}>
+        <sphereGeometry args={[1.4, 32, 32]} />
+        <meshBasicMaterial color="#ffaa00" transparent opacity={0.18} side={THREE.BackSide} depthWrite={false} />
       </mesh>
       <mesh>
-        <sphereGeometry args={[1.5, 32, 32]} />
-        <meshBasicMaterial color="#ffaa00" transparent opacity={0.15} side={THREE.BackSide} />
+        <sphereGeometry args={[1.9, 32, 32]} />
+        <meshBasicMaterial color="#ff6600" transparent opacity={0.07} side={THREE.BackSide} depthWrite={false} />
       </mesh>
     </group>
   )
@@ -85,8 +94,8 @@ function Sun() {
 function OrbitRing({ radius }) {
   return (
     <mesh rotation={[Math.PI / 2, 0, 0]}>
-      <torusGeometry args={[radius, 0.01, 2, 128]} />
-      <meshBasicMaterial color="#ffffff" transparent opacity={0.07} />
+      <torusGeometry args={[radius, 0.012, 2, 160]} />
+      <meshBasicMaterial color="#ffffff" transparent opacity={0.06} />
     </mesh>
   )
 }
@@ -100,7 +109,7 @@ function OrbitingPlanet({ project, onSelect, selected }) {
     if (meshRef.current) {
       meshRef.current.position.x = Math.cos(angleRef.current) * project.orbitRadius
       meshRef.current.position.z = Math.sin(angleRef.current) * project.orbitRadius
-      meshRef.current.rotation.y += 0.01
+      meshRef.current.rotation.y += 0.012
     }
   })
 
@@ -115,13 +124,13 @@ function OrbitingPlanet({ project, onSelect, selected }) {
         onPointerOver={(e) => { e.stopPropagation(); document.body.style.cursor = 'pointer' }}
         onPointerOut={() => { document.body.style.cursor = 'auto' }}
       >
-        <sphereGeometry args={[project.size, 32, 32]} />
+        <sphereGeometry args={[project.size, 40, 40]} />
         <meshStandardMaterial
           color={project.color}
           emissive={project.color}
-          emissiveIntensity={selected ? 0.6 : 0.2}
-          roughness={0.6}
-          metalness={0.2}
+          emissiveIntensity={selected ? 0.7 : 0.25}
+          roughness={0.55}
+          metalness={0.15}
         />
         {selected && (
           <Html distanceFactor={10} center>
@@ -141,7 +150,7 @@ function OrbitingPlanet({ project, onSelect, selected }) {
         {!selected && (
           <Html distanceFactor={14} center>
             <div style={{
-              color: 'rgba(255,255,255,0.6)',
+              color: 'rgba(255,255,255,0.55)',
               fontSize: '9px',
               whiteSpace: 'nowrap',
               pointerEvents: 'none',
@@ -159,7 +168,7 @@ function OrbitingPlanet({ project, onSelect, selected }) {
 function SolarSystemScene({ onSelect, selectedProject }) {
   return (
     <>
-      <ambientLight intensity={0.15} />
+      <ambientLight intensity={0.18} />
       <Sun />
       {PROJECTS.map((p) => (
         <OrbitRing key={p.name + '-ring'} radius={p.orbitRadius} />
@@ -172,15 +181,14 @@ function SolarSystemScene({ onSelect, selectedProject }) {
           selected={selectedProject?.name === p.name}
         />
       ))}
+      {/* Zoom disabled to prevent scroll trap */}
       <OrbitControls
         enablePan={false}
-        enableZoom={true}
-        maxDistance={30}
-        minDistance={5}
+        enableZoom={false}
         autoRotate
-        autoRotateSpeed={0.3}
-        maxPolarAngle={Math.PI * 0.6}
-        minPolarAngle={Math.PI * 0.2}
+        autoRotateSpeed={0.4}
+        maxPolarAngle={Math.PI * 0.58}
+        minPolarAngle={Math.PI * 0.25}
       />
     </>
   )
@@ -188,6 +196,7 @@ function SolarSystemScene({ onSelect, selectedProject }) {
 
 export default function ProjectsSection() {
   const [selectedProject, setSelectedProject] = useState(null)
+  const [isHovered, setIsHovered] = useState(false)
 
   return (
     <section id="projects" className="projects-section">
@@ -198,10 +207,16 @@ export default function ProjectsSection() {
         </p>
       </div>
 
-      <div className="projects-canvas">
+      {/* pointer-events only active when hovered so scroll passes through */}
+      <div
+        className="projects-canvas"
+        style={{ pointerEvents: isHovered ? 'auto' : 'none' }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
         <Canvas
-          style={{ width: '100%', height: '100%' }}
-          camera={{ position: [0, 12, 22], fov: 55 }}
+          style={{ width: '100%', height: '100%', pointerEvents: 'auto' }}
+          camera={{ position: [0, 9, 17], fov: 52 }}
           gl={{ antialias: true }}
         >
           <SolarSystemScene onSelect={setSelectedProject} selectedProject={selectedProject} />
@@ -231,6 +246,10 @@ export default function ProjectsSection() {
           </div>
         </div>
       )}
+
+      <div className="projects-scroll-hint">
+        <span>↓ Scroll past to continue</span>
+      </div>
     </section>
   )
 }
