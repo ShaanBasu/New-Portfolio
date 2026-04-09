@@ -12,9 +12,10 @@ function PlanetScene() {
     <>
       <ambientLight intensity={0.4} />
       <directionalLight position={[5, 5, 5]} intensity={0.8} color="#ffffff" />
-      <pointLight position={[-5, 5, 0]} intensity={1} color="#8b5cf6" />
+      <pointLight position={[-5, 5, 0]} intensity={1.2} color="#8b5cf6" />
       <Planet
         color="#6d28d9"
+        planetType="gas"
         size={2.2}
         emissiveColor="#3b0764"
         atmosphereColor="#8b5cf6"
