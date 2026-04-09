@@ -298,10 +298,6 @@ function CrystalConnector() {
   useEffect(() => {
     gsap.set(svgRef.current, { opacity: 0 })
     const els = lineRefs.current.filter(Boolean)
-    // Group by depth for staged appearance
-    const byDepth = [1, 2, 3, 4, 5].map((d) =>
-      els.filter((_, i) => branches[i]?.depth === d)
-    )
     gsap.set(els, { opacity: 0 })
 
     const trigger = ScrollTrigger.create({
@@ -310,7 +306,9 @@ function CrystalConnector() {
       once: true,
       onEnter: () => {
         gsap.to(svgRef.current, { opacity: 1, duration: 0.3 })
-        byDepth.forEach((group, di) =>
+        // Animate trunk first (high depth) then branches (low depth)
+        ;[4, 3, 2, 1].forEach((d, di) => {
+          const group = els.filter((_, i) => branches[i]?.depth === d)
           gsap.to(group, {
             opacity: 1,
             duration: 0.6,
@@ -318,7 +316,7 @@ function CrystalConnector() {
             ease: 'power2.out',
             delay: di * 0.3,
           })
-        )
+        })
       },
     })
     return () => trigger.kill()
@@ -328,8 +326,9 @@ function CrystalConnector() {
     <div className="section-connector" ref={svgRef}>
       <svg width="100%" height="200" viewBox="0 0 1600 200" preserveAspectRatio="xMidYMax meet">
         {branches.map((seg, i) => {
-          const col = depthColors[5 - seg.depth] || depthColors[4]
-          const sw = depthWidths[5 - seg.depth] || depthWidths[4]
+          const di = 4 - seg.depth  // 0=trunk(depth4) → 3=tips(depth1)
+          const col = depthColors[di] ?? depthColors[depthColors.length - 1]
+          const sw = depthWidths[di] ?? depthWidths[depthWidths.length - 1]
           return (
             <line
               key={i}
